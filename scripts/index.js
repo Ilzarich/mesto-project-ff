@@ -52,6 +52,7 @@ deleteCard = card => { card.remove(); };
 createCard = (cardInfo, deleteCardCallback) => {
     const cardTemplateClone = cardTemplate.querySelector('.places__item').cloneNode(true);
     cardTemplateClone.querySelector('.card__image').src = cardInfo.link;
+    cardTemplateClone.querySelector('.card__image').alt = cardInfo.alt;
     cardTemplateClone.querySelector('.card__title').textContent = cardInfo.name;
     
     const cardDeleteBtn = cardTemplateClone.querySelector('.card__delete-button');

@@ -1,6 +1,6 @@
 const cardTemplate = document.querySelector('#card-template').content;
 
-const createCard = (cardInfo, deleteCard, buttonLike, openPopupImage) => {
+const createCard = (cardInfo, deleteCard, handleCardLike, onImageClick) => {
     const cardTemplateClone = cardTemplate.querySelector('.places__item').cloneNode(true);
     const cardItem = cardTemplateClone.querySelector('.card__image');
     cardItem.src = cardInfo.link;
@@ -13,12 +13,12 @@ const createCard = (cardInfo, deleteCard, buttonLike, openPopupImage) => {
         deleteCard(cardTemplateClone);
     });
 
-    const like = cardTemplateClone.querySelector('.card__like-button');
-    like.addEventListener('click', () => {
-        buttonLike(like)
+    const likeButton = cardTemplateClone.querySelector('.card__like-button');
+    likeButton.addEventListener('click', () => {
+        handleCardLike(likeButton)
     }); 
 
-    cardItem.addEventListener('click', () => openPopupImage(cardInfo.name, cardInfo.link));
+    cardItem.addEventListener('click', () => onImageClick(cardInfo.name, cardInfo.link));
     
     return cardTemplateClone;
 };
@@ -28,10 +28,8 @@ const deleteCard = card => {
     card.remove();
 };
 
-const buttonLike = likeBtn => {
+const handleCardLike = likeBtn => {
     likeBtn.classList.toggle('card__like-button_is-active');
 }
 
-const openPopupImage = (name, link) => {}; 
-
-export {createCard, deleteCard, buttonLike, openPopupImage}
+export {createCard, deleteCard, handleCardLike}

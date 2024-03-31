@@ -1,7 +1,7 @@
 // @todo: Темплейт карточки
 import '../pages/index.css';
 import { initialCards } from './cards.js';
-import { openModal, closeModal, handleCloseModalByOverlay} from './modal.js';
+import { openModal, closeModal, setCloseByClickListeners} from './modal.js';
 import { createCard, deleteCard, handleCardLike} from './card.js';
 
 // @todo: DOM узлы
@@ -34,7 +34,7 @@ editModalButton.addEventListener('click', () => {
     openModal(editModal);
 })
 
-function dataFormEdit(event) { // функция изменения данных в щапке 
+function handleProfileEditFormSubmit(event) { // функция изменения данных в щапке 
     event.preventDefault();
   
     name.textContent = inputName.value;
@@ -43,7 +43,7 @@ function dataFormEdit(event) { // функция изменения данных
     closeModal(editModal);
   }
 
-profileForm.addEventListener('submit', dataFormEdit); 
+profileForm.addEventListener('submit', handleProfileEditFormSubmit); 
 
 addModalButton.addEventListener('click', () => { // открытие попапа для профиля 
     openModal(addModal);
@@ -51,21 +51,22 @@ addModalButton.addEventListener('click', () => { // открытие попап�
 
 const cardForm = document.forms['new-place'];
 
-function formAddCard(event) { // функция добавления новой карточки 
+function handleCardAddFormSubmit(event) { // функция добавления новой карточки 
     event.preventDefault();
     
-    const cardNameInput = cardForm.elements['place-name'].value;
-    const cardLinkInput  = cardForm.elements.link.value;
+    const cardName  = cardForm.elements['place-name'].value;
+    const cardLink = cardForm.elements.link.value;
   
-    const card = createCard({ name: cardNameInput, link: cardLinkInput }, deleteCard, handleCardLike, openImageModal)
+    const card = createCard({ name: cardName , link: cardLink}, deleteCard, handleCardLike, openImageModal)
     cardsContainer.prepend(card);
   
     cardForm.reset();
   
-    closeModal(addModal);
+    // closeModal(addModal);
+    closeModal(addModal)
 }
 
-cardForm.addEventListener('submit', formAddCard);
+cardForm.addEventListener('submit', handleCardAddFormSubmit);
 
 const imageModal = document.querySelector('.popup_type_image');
 
@@ -79,4 +80,6 @@ function openImageModal(name, link) {
   openModal(imageModal);
 }
 
-handleCloseModalByOverlay();
+const popupElemenet = document.querySelectorAll('.popup')
+
+setCloseByClickListeners(popupElemenet)

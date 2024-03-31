@@ -80,6 +80,6 @@ function openImageModal(name, link) {
   openModal(imageModal);
 }
 
-const popupElemenet = document.querySelectorAll('.popup')
+const popupList = document.querySelectorAll('.popup')
 
-setCloseByClickListeners(popupElemenet)
+setCloseByClickListeners(popupList)

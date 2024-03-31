@@ -12,7 +12,7 @@ function setCloseByClickListeners (modals) {
         const closeButton = modal.querySelector('.popup__close')
         // Вешаем обработчик закрытия на кнопку
         closeButton.addEventListener('click', () => {
-            modal.classList.remove('popup_is-opened');
+            closeModal(modal);
         })
 
         // Вешаем обработчик закрытия на оверлей

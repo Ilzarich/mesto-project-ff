@@ -19,7 +19,7 @@ Promise.all([getUser(), getCards()])
     console.log(cardData)
     name.textContent = userData.name;
     subtitle.textContent = userData.about;
-    // profileImage.style.backgroundImage = `url(${userData.image})`;
+    profileImage.style.backgroundImage = `url(${userData.image})`;
     userId = userData._id;
     cardData.forEach((item) => {
       const newCard = createCard(item, deleteCardModal, likeCard, openImageModal,  item.likes.length, item.owner._id, userId);
@@ -59,6 +59,7 @@ const addModal = document.querySelector('.popup_type_new-card');
 // открытие и редактрование профиля пользователя 
 const name = document.querySelector('.profile__title');
 const subtitle = document.querySelector('.profile__description');
+const profileImage = document.querySelector('.profile__image');
 
 const profileForm = document.forms['edit-profile']; // получание формы 
 

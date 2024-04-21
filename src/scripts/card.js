@@ -1,35 +1,28 @@
 const cardTemplate = document.querySelector('#card-template').content;
 
-const createCard = (cardInfo, deleteCard, handleCardLike, onImageClick) => {
+const createCard = (item, deleteCardModal, likeCard, openImageModal, likes, idUser, idCard, userId) => {
     const cardTemplateClone = cardTemplate.querySelector('.places__item').cloneNode(true);
-    const cardItem = cardTemplateClone.querySelector('.card__image');
-    cardItem.src = cardInfo.link;
-    cardItem.alt = cardInfo.alt;
-    cardTemplateClone.querySelector('.card__title').textContent = cardInfo.name;
-
 
     const cardDeleteBtn = cardTemplateClone.querySelector('.card__delete-button');
-    cardDeleteBtn.addEventListener('click', () => {
-        deleteCard(cardTemplateClone);
-    });
+    if(idUser !== userId) {
+        cardDeleteBtn.classList.add('card__delete-button-disabled');
+        cardDeleteBtn.disabled = true;
+    }
 
-    const likeButton = cardTemplateClone.querySelector('.card__like-button');
-    likeButton.addEventListener('click', () => {
-        handleCardLike(likeButton)
-    }); 
+    cardTemplateClone.querySelector('.card__title').textContent = item.name;
+    cardTemplateClone.querySelector('.card_like-count').textContent = likes;
+    const cardItem = cardTemplateClone.querySelector('.card__image');
+    cardItem.src = item.link;
+    cardItem.alt = item.name;
 
-    cardItem.addEventListener('click', () => onImageClick(cardInfo.name, cardInfo.link));
-    
-    return cardTemplateClone;
-};
+    cardDeleteBtn.addEventListener('click', () => deleteCardModal(idCard, cardTemplateClone));
 
-// @todo: Функция удаления карточки
-const deleteCard = card => { 
-    card.remove();
-};
+    const isLike = cardTemplateClone.querySelector('.card__like-button');
+    isLike.addEventListener('click', () => likeCard(idCard, cardTemplateClone, isLike));
 
-const handleCardLike = likeBtn => {
-    likeBtn.classList.toggle('card__like-button_is-active');
+    cardItem.addEventListener('click', () => openImageModal(item.alt, item.link))
+
+    return cardTemplateClone
 }
 
-export {createCard, deleteCard, handleCardLike}
+export {createCard}

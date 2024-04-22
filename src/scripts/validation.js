@@ -13,13 +13,27 @@
     errorElement.classList.remove(validationConfig.errorClass); //удаляем классы с ошибкой из спанов
   }
 
-  function checkInputValidity(formElement, inputElement, validationConfig) {  //функция проверки валидности
-    const customErrorMessage = inputElement.dataset.errorMessage; //вытаскиваем кастомное сообщение из инпута
-     if (!inputElement.validity.valid) { //если значение не валидно через браузерную проверку то тоже вешаем функцию показа ошибок
-      showInputError( formElement, inputElement, inputElement.validationMessage, validationConfig
-      );
-    } else if (inputElement.validity.valid){
-      hideInputError(formElement, inputElement, validationConfig); //если валидно снимаем показ ошибок
+  // function checkInputValidity(formElement, inputElement, validationConfig) {  //функция проверки валидности
+  //   const customErrorMessage = inputElement.dataset.errorMessage; //вытаскиваем кастомное сообщение из инпута
+  //    if (!inputElement.validity.valid) { //если значение не валидно через браузерную проверку то тоже вешаем функцию показа ошибок
+  //     showInputError( formElement, inputElement, inputElement.validationMessage, validationConfig
+  //     );
+  //   } else if (inputElement.validity.valid){
+  //     hideInputError(formElement, inputElement, validationConfig); //если валидно снимаем показ ошибок
+  //   }
+  // }
+
+
+  function checkInputValidity(formElement, inputElement, validationConfig) {
+    const customErrorMessage = inputElement.dataset.errorMessage; // Вытаскиваем кастомное сообщение из инпута
+    if (!inputElement.validity.valid) {
+      if (inputElement.validity.patternMismatch && customErrorMessage) {
+        showInputError(formElement, inputElement, customErrorMessage, validationConfig);
+      } else {
+        showInputError(formElement, inputElement, inputElement.validationMessage, validationConfig);
+      }
+    } else {
+      hideInputError(formElement, inputElement, validationConfig);
     }
   }
   
@@ -68,12 +82,13 @@ const toggleButtonState = (inputList, buttonElement, validationConfig) => {
 
 // // Функция которая убирает все сообщения и сбрасывает состояние кнопки
 
-export const clearValid = (profileForm, validationConfig) => {
-    const inputList = Array.from(profileForm.querySelectorAll(validationConfig.inputSelector));
-    const buttonElement = profileForm.querySelector(validationConfig.submitButtonSelector);
+export const clearValidation = (formElement, validationConfig) => {
+    const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
+    const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
     inputList.forEach((inputElement) => {
-        hideInputError(profileForm, inputElement, validationConfig);//profileForm, inputElement, validationConfig.inputErrorClass, validationConfig.errorClass
+        hideInputError(formElement, inputElement, validationConfig);//profileForm, inputElement, validationConfig.inputErrorClass, validationConfig.errorClass
     });
+    formElement.reset()
     toggleButtonState(inputList, buttonElement, validationConfig.inactiveButtonClass);
 }
 

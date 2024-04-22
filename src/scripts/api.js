@@ -75,7 +75,7 @@ async function deleteCardApi(cardId) {
 };
 
 async function putLike(cardId) {
-    return fetch(`${configApi.myUrl}/cards/like${cardId}`, {
+    return fetch(`${configApi.myUrl}/cards/like/${cardId}`, {
             method: "PUT",
             headers: configApi.headers
         })

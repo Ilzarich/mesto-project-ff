@@ -7,6 +7,8 @@ const createCard = (item, deleteCardModal, likeCard, openImageModal, likes, idUs
     if(idUser !== userId) {
         cardDeleteBtn.classList.add('card__delete-button-disabled');
         cardDeleteBtn.disabled = true;
+    } else {
+        cardDeleteBtn.addEventListener('click', () => deleteCardModal(idCard, cardTemplateClone));
     }
 
     cardTemplateClone.querySelector('.card__title').textContent = item.name;
@@ -15,14 +17,12 @@ const createCard = (item, deleteCardModal, likeCard, openImageModal, likes, idUs
     cardItem.src = item.link;
     cardItem.alt = item.name;
 
-    cardDeleteBtn.addEventListener('click', () => deleteCardModal(idCard, cardTemplateClone));
-
-    const isLike = cardTemplateClone.querySelector('.card__like-button');
-    isLike.addEventListener('click', () => likeCard(idCard, cardTemplateClone, isLike));
+    const likeButton = cardTemplateClone.querySelector('.card__like-button');
+    likeButton.addEventListener('click', () => likeCard(idCard, cardTemplateClone, likeButton));
 
     cardItem.addEventListener('click', () => openImageModal(item.alt, item.link))
 
     return cardTemplateClone
-}
+} 
 
 export {createCard}

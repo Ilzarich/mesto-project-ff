@@ -3,7 +3,7 @@ import '../pages/index.css';
 import { initialCards } from './cards.js';
 import { openModal, closeModal, setCloseByClickListeners } from './modal.js';
 import { createCard } from './card.js';
-import { enableValidation, clearValid} from './validation.js';
+import { enableValidation, clearValidation} from './validation.js';
 import { getCards, getUser, postCards, postMe, deleteCardApi, putLike, deleteLike, patchUser } from './api.js';
 
 // @todo: DOM узлы
@@ -19,27 +19,22 @@ Promise.all([getUser(), getCards()])
     console.log(cardData)
     name.textContent = userData.name;
     subtitle.textContent = userData.about;
-    profileImage.style.backgroundImage = `url(${userData.image})`;
+    profileImage.style.backgroundImage = `url(${userData.avatar})`;
     userId = userData._id;
     cardData.forEach((item) => {
       const newCard = createCard(item, deleteCardModal, likeCard, openImageModal,  item.likes.length, item.owner._id, userId);
-      item.likes.forEach((like) => {
-        if(like._id === userId) {
-          const isLike = newCard.querySelector('.card__like-button');
-          isLike.classList.add('card__like-button_is-active');
-        }
-      });
       cardsContainer.append(newCard)
+    });
+    cardData.forEach((item) => {
+      if (item.likes.some(like => like._id === userId)) {
+        const likeButton = newCard.querySelector('.card__like-button');
+        likeButton.classList.add("card__like-button_is-active"); 
+      };
     })
   })
   .catch((err) => {
     console.log(err)
   })
-
-// initialCards.forEach(cardInfo => {
-//     const newCard = createCard(cardInfo, deleteCard, handleCardLike, openImageModal);
-//     cardsContainer.append(newCard);
-// });
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -69,7 +64,7 @@ const inputSubtitle = profileForm.elements.description; // input с описан
 editModalButton.addEventListener('click', () => {
     inputName.value = name.textContent;
     inputSubtitle.value = subtitle.textContent;
-    clearValid(editModal, validationConfig)
+    clearValidation(editModal, validationConfig)
     openModal(editModal);
 })
 
@@ -77,11 +72,11 @@ const buttonCheck = document.querySelector('.button')
 
 function handleProfileEditFormSubmit(event) { // функция изменения данных в щапке 
     event.preventDefault();
-    buttonCheck.textContent = "Сохранить?";
+    buttonCheck.textContent = "Сохранение...";
     postMe(inputName.value, inputSubtitle.value)
     .then((res) => {
-      name.textContent = inputName.value;
-      subtitle.textContent = inputSubtitle.value;
+      name.textContent = res.value;
+      subtitle.textContent = res.value;
       closeModal(editModal);
     })
     .catch((err) => {
@@ -96,18 +91,18 @@ profileForm.addEventListener('submit', handleProfileEditFormSubmit);
 
 addModalButton.addEventListener('click', () => { // открытие попапа для профиля 
     openModal(addModal);
-    clearValid(addModal, validationConfig)
+    clearValidation(addModal, validationConfig)
   })
 
 const cardForm = document.forms['new-place'];
 
 function handleCardAddFormSubmit(event) { 
   event.preventDefault();
-  buttonCheck.textContent = "Сохранить?";
+  buttonCheck.textContent = "Сохранение...";
   postCards(cardForm.elements.placeName.value, cardForm.elements.link.value)
   .then((res) => {
-    const cardName = cardForm.elements.placeName.value;
-    const cardLink = cardForm.elements.link.value;
+    const cardName = res.elements.placeName.value;
+    const cardLink = res.elements.link.value;
 
     const card = createCard({ name: cardName , link: cardLink}, deleteCardModal, likeCard, openImageModal, res.likes.length, res.owner._id, res._id, userId);
     cardsContainer.prepend(card);
@@ -139,45 +134,43 @@ function openImageModal(name, link) {
 const openDel = document.querySelector('.popup_card_delete');
 const cardDelFormNew = document.querySelector('.popup__button-delete');
 
-const deleteCardModal = (cardId, newCard) => {
-  openModal(openDel);
-  cardDelFormNew.addEventListener('click', () => {
-    console.log(cardDelFormNew)
-    deleteCardApi(cardId)
-    .then((res) => {
-      console.log(res);
-      newCard.remove();
-      closeModal(openDel)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-  })
-}
+let cardToDelete = null;
+let cardToDeleteId = null;
 
-const likeCard = (cardId, newCard, isLike) => {
-  if(isLike.classList.contains('card__like-button_is-active')) {
-    isLike.classList.remove('card__like-button_is-active');
-    deleteLike(cardId) 
-    .then((res) => {
-      newCard.querySelector('.card_like-count').textContent = res.likes.length;
-    })
-    .catch((err) => {
-      isLike.classList.add('card__like-button_is-active');
-      console.log(err);
-    });
-  } else {
-    isLike.classList.add('card__like-button_is-active');
-    putLike(cardId)
-    .then((res) => {
-        newCard.querySelector('.card_like-count').textContent = res.likes.length;
+cardDelFormNew.addEventListener('click', () => {
+  if (cardToDelete && cardToDeleteId) {
+    deleteCardApi(cardToDeleteId)
+      .then((res) => {
+        console.log(res);
+        cardToDelete.remove();
+        closeModal(openDel);
+        cardToDelete = null;
+        cardToDeleteId = null;
       })
       .catch((err) => {
-        isLike.classList.remove('card__like-button_is-active');
         console.log(err);
       });
   }
+});
+
+const deleteCardModal = (cardId, newCard) => {
+  openModal(openDel);
+  cardToDelete = newCard;
+  cardToDeleteId = cardId;
+};
+
+const likeCard = (cardId, newCard, isLike) => {
+  const likeButton = isLike;
+  const likeMethod = likeButton.classList.contains('card__like-button_is-active') ? deleteLike : putLike;
+  likeMethod(cardId)
+    .then((res) => {
+      newCard.querySelector('.card_like-count').textContent = res.likes.length;
+      likeButton.classList.toggle("card__like-button_is-active");
+    })
+    .catch(err => console.log(err));
 }
+
+
 
 const userAvatar = document.querySelector('.profile__image');
 const modalAvatar = document.querySelector('.popup_card_update-avatar');
@@ -188,12 +181,12 @@ const avatarInput = formAvatar.elements.avatar;
 userAvatar.addEventListener('click', () => {
   openModal(modalAvatar);
   avatarInput.value = '';
-  clearValid(modalAvatar, validationConfig);
+  clearValidation(modalAvatar, validationConfig);
 });
 
 function handFormAvatar(event) {
   event.preventDefault();
-  buttonCheck.textContent = 'Сохранить?';
+  buttonCheck.textContent = 'Сохранение...';
   patchUser(avatarInput.value)
   .then((res) => {
     userAvatar.style.backgroundImage = `url(${res.avatar})`;
